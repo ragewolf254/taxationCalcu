@@ -1,0 +1,203 @@
+<html>
+  <head>
+    <title>Calcu</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  </head>
+  <body>
+    <div id="app-1">
+      <span>Monthly Salary:</span>
+      <input type="number" v-model.number="ms"/>
+      <br>
+      <span>Monthly Premiums (Constant):</span>
+      <input type="number" v-model.number="mp"/>
+      <!-- <span>{{ answer }}</span> -->
+      <br>
+      <span>First Pass</span>
+      <br>
+      <p>MS: {{ ms }} - MP: {{ mp }} = {{ ms - mp }}</p>
+      <br>
+      <span>Second Pass (Maliit na TT)</span>
+      <p>  {{ secondPass }} </p> <br>
+
+      <span>Third Pass (multiply by percent) (Maliit na TT)</span>
+      <p> {{ thirdPass }} </p> <br>
+
+      <span>Monthly Tax (Maliit na TT)</span>
+      <p> {{ monthlyTax }} </p> <br>
+
+      <span>Annual Tax (Maliit na TT)</span>
+      <p> {{ annualTax }} </p> <br>
+
+      <span>Taxable Ammount (Malaking TT)</span>
+      <p>MS: {{ ms }} * 12 = {{ ms * 12 }} - MP: {{ mp }} * 12 = {{ mp * 12 }} = {{ taxableAmmount }}</p><br>
+
+      <span>Monthly Salary - 90000 (Malaking TT)</span>
+      <p>MS: {{ ms }} - 90000 = {{ msDeduction }} </p><br>
+
+      <span>Taxable Ammount + 900000 Differential (Malaking TT)</span>
+      <p>{{ taxableAmmount }} + {{ msDeduction }} = {{ personalIncomeTaxPassZero }} </p><br>
+
+      <span>Personal Income Tax Phase 1 (Multiply by percent )(Malaking TT)</span>
+      <p> {{ personalIncomeTaxRatePassOne }} </p><br>
+
+      <span>Personal Income Tax Phase 2 (Add Differential )(Malaking TT)</span>
+      <p>{{ personalIncomeTaxRatePassTwo }} </p><br>
+
+      <span>Tax Due (Malaking TT)</span>
+      <p>{{ taxDue }} </p><br>
+
+      <span>Tax Adjustment (Malaking TT)</span>
+      <p>{{ taxAdjustment }} </p><br>
+
+      <span>Dec Tax Due (Malaking TT)</span>
+      <p>{{ decTaxDue }} </p><br>
+
+      <span>Net Pay (Malaking TT)</span>
+      <p>{{ netPay }} </p><br>
+
+    </div>
+  </body>
+  <script>
+    var app6 = new Vue({
+      el: '#app-1',
+      data: {
+        ms: 0,
+        mp: 0,
+        secondPassReturn: 0,
+        thirdPassReturn: 0,
+        monthlyTaxReturn: 0,
+        taxableAmmountReturn: 0,
+        msDeductionReturn: 0,
+        personalIncomeTaxPassZeroReturn: 0,
+        personalIncomeTaxRatePassOneReturn: 0,
+        personalIncomeTaxRatePassTwoReturn: 0,
+        taxDueReturn: 0,
+        taxAdjustmentReturn: 0,
+        taxCollected: 0,
+        decTaxDueReturn: 0,
+        baseSubtract: 0,
+        netPayReturn: 0,
+        baseAdd: 0,
+        withTax: 0,
+        multiplier: 0
+      },
+      computed: {
+        secondPass: function() {
+          if ((this.ms + this.mp) <= 20833) {
+            this.baseSubtract = 0.0;
+            this.withTax = 0;
+          } else if ((this.ms + this.mp) >= 20833 && (this.ms + this.mp) <= 33333) {
+            this.baseSubtract = 0.0;
+            this.withTax = 0;
+            this.multiplier = 0.02;
+          } else if ((this.ms + this.mp) >= 33333 && (this.ms + this.mp) <= 66667) {
+            this.baseSubtract = 33333;
+            this.withTax = 2500;
+            this.multiplier = 0.25;
+          } else if ((this.ms + this.mp) >= 66667 && (this.ms + this.mp) <= 166667) {
+            this.baseSubtract = 66667;
+            this.withTax = 10833.33;
+            this.multiplier = 0.30;
+          } else if ((this.ms + this.mp) >= 166667 && (this.ms + this.mp) <= 666667) {
+            this.baseSubtract = 166667;
+            this.withTax = 40833.33;
+            this.multiplier = 0.32;
+          } else {
+            this.baseSubtract = 666667;
+            this.withTax = 200833.33;
+            this.multiplier = 0.35;
+          }
+          this.secondPassReturn = (this.ms - this.mp) - this.baseSubtract;
+          return this.secondPassReturn;
+        },
+
+        thirdPass: function() {
+          this.thirdPassReturn = this.secondPassReturn * this.multiplier;
+          return this.thirdPassReturn
+        },
+
+        monthlyTax: function() {
+          this.monthlyTaxReturn = this.thirdPassReturn + this.withTax;
+          return this.monthlyTaxReturn
+        },
+
+        annualTax: function() {
+          this.taxCollected = this.monthlyTaxReturn * 12;
+          return this.taxCollected;
+        },
+
+        taxableAmmount: function() {
+          this.taxableAmmountReturn =  (this.ms * 12) - (this.mp * 12);
+          return this.taxableAmmountReturn;
+        },
+
+        msDeduction: function() {
+          this.msDeductionReturn = this.ms - 90000;
+          return this.msDeductionReturn;
+        },
+
+        personalIncomeTaxPassZero: function() {
+          this.personalIncomeTaxPassZeroReturn = this.msDeductionReturn + this.taxableAmmountReturn;
+          return this.personalIncomeTaxPassZeroReturn;
+        },
+
+        personalIncomeTaxRatePassOne: function() {
+            if (this.personalIncomeTaxPassZeroReturn <= 250000) {
+              this.baseSubtract = 0.0;
+            } else if (this.personalIncomeTaxPassZeroReturn > 250000 && this.personalIncomeTaxPassZeroReturn <= 400000) {
+              this.baseSubtract = 250000;
+              this.multiplier = 0.02;
+            } else if (this.personalIncomeTaxPassZeroReturn > 400000 && this.personalIncomeTaxPassZeroReturn <= 800000) {
+              this.baseSubtract = 400000;
+              this.baseAdd = 30000;
+              this.multiplier = 0.25;
+            } else if (this.personalIncomeTaxPassZeroReturn > 800000 && this.personalIncomeTaxPassZeroReturn <= 2000000) {
+              this.baseSubtract = 800000;
+              this.baseAdd = 130000;
+              this.multiplier = 0.30;
+            } else if (this.personalIncomeTaxPassZeroReturn > 2000000 && this.personalIncomeTaxPassZeroReturn <= 8000000) {
+              this.baseSubtract = 2000000;
+              this.baseAdd = 490000;
+              this.multiplier = 0.32;
+            } else {
+              this.baseSubtract = 8000000;
+              this.baseAdd = 2410000;
+              this.multiplier = 0.35;
+            }
+          this.personalIncomeTaxRatePassOneReturn = this.personalIncomeTaxPassZeroReturn - this.baseSubtract;
+          return this.personalIncomeTaxRatePassOneReturn;
+        },
+
+        personalIncomeTaxRatePassTwo: function() {
+          this.personalIncomeTaxRatePassTwoReturn = this.personalIncomeTaxRatePassOneReturn * this.multiplier;
+          return this.personalIncomeTaxRatePassTwoReturn;
+        },
+
+        taxDue: function() {
+          this.taxDueReturn = this.personalIncomeTaxRatePassTwoReturn + this.baseAdd;
+          return this.taxDueReturn;
+        },
+
+        taxAdjustment: function() {
+          this.taxAdjustmentReturn = this.taxDueReturn - this.taxCollected;
+          return this.taxAdjustmentReturn;
+        },
+
+        decTaxDue: function() {
+          this.decTaxDueReturn = this.monthlyTaxReturn + this.taxAdjustmentReturn;
+          return this.decTaxDueReturn;
+        },
+
+        netPay: function() {
+          this.netPayReturn = ( this.ms - this.monthlyTaxReturn ) - this.mp;
+          return this.netPayReturn;
+        }
+
+      }
+      
+    })
+  </script>
+</html>
+
+
+
